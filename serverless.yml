@@ -1,0 +1,52 @@
+service: cfn-stack-removal-reminder-lambda
+
+custom:
+  pythonRequirements:  # serverless-python-requirements settings
+    dockerizePip: non-linux
+    layer: true
+    slim: true
+
+provider:
+  name: aws
+  runtime: python3.9
+
+functions:
+  cfn-stack-removal-reminder:
+    name: cfn-stack-removal-reminder
+    handler: src/removal_reminder.lambda_handler
+    timeout: 30
+    package: {}
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - cloudwatch:PutMetricData
+          - logs:CreateLogGroup
+          - logs:CreateLogStream
+          - logs:PutLogEvents
+          - logs:PutRetentionPolicy
+        Resource:
+          - '*'
+      - Effect: Allow
+        Action:
+          - ec2:CreateNetworkInterface
+          - ec2:DescribeNetworkInterfaces
+          - ec2:DeleteNetworkInterface
+        Resource:
+          - '*'
+      - Effect: Allow
+        Action:
+          - sns:*
+        Resource:
+          - '*'
+      - Effect: Allow
+        Action:
+          - cloudformation:ListStacks
+          - cloudformation:DescribeStacks
+        Resource:
+          - '*'
+    iamRoleStatementsName: cfn-stack-reminder-role
+    events:
+      - schedule:
+          name: cfn_stack_removal_reminder_event
+          rate: cron(0 18 ? * FRI *)
+          enabled: true
