@@ -1,9 +1,9 @@
 # Cloudformation Stack Reminder Tool
 Simple serverless project that deploys an event bridge event, a lambda and an sns topic. Together, these resources will notify you weekly of any Cloudformation stacks left in your account and sort them by Age.
 
-Example Email:
-(./img/example-email.png)
+Here is an example of the email that is received:
 
+![img](./img/example-email.png)
 ## How to deploy:
 1. Clone this repo to your local environment.
 2. Authenticate into the account in which you intend on deploying this tool in.
