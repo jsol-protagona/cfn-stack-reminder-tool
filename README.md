@@ -4,6 +4,14 @@ Simple serverless project that deploys an event bridge event, a lambda and an sn
 Here is an example of the email that is received:
 
 ![img](./img/example-email.png)
+
+## Prerequites
+Serverless to deploy the code
+https://www.serverless.com/framework/docs/getting-started
+
+Using NPM:
+`npm install -g serverless` 
+
 ## How to deploy:
 1. Clone this repo to your local environment.
 2. Authenticate into the account in which you intend on deploying this tool in.
@@ -14,3 +22,7 @@ Here is an example of the email that is received:
 ### To test: 
 You must confirm the subscription before you test the lambda otherwise the emails will not send.
 1. Navigate to the cfn-stack-removal-reminder lambda and create a test. The event data for this test is not important because the lambda itself does not use the data.
+
+## How to Destroy:
+1. Authenticate into the account in which you deployed this tool in.
+2. Destroy the stack using Serverless `sls destroy`.
