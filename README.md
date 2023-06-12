@@ -4,7 +4,6 @@ Simple serverless project that deploys an event bridge event, a lambda and an sn
 Here is an example of the email that is received:
 
 ![img](./img/example-email.png)
-
 ## Prerequites
 Serverless to deploy the code
 https://www.serverless.com/framework/docs/getting-started
