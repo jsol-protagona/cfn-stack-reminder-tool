@@ -75,7 +75,7 @@ def lambda_handler(event, context):
         stack_region = stack_id[23:32]
         stack_name = stack["StackName"]
         stack_creation_date = stack["CreationTime"]
-        if "stack-reminder" not in stack_name:
+        if "cfn-stack-removal-reminder" not in stack_name:
             if "." in (str(stack_creation_date)):
                 ts = datetime.strptime(
                     str(stack_creation_date), "%Y-%m-%d %H:%M:%S.%f%z"
@@ -90,6 +90,7 @@ def lambda_handler(event, context):
             name_date = {"region": stack_region, "name": stack_name, "age": age}
             stripped_stacks.append(name_date)
     stack_name_len = 0
+    cf_max_len = 128
     stack_list_under_5 = []
     stack_list_over_5 = []
     stack_list_over_30 = []
@@ -100,13 +101,8 @@ def lambda_handler(event, context):
             elif key == "name":
                 name_age = name_age + "    " + value
                 stack_length = len(value)
-                if stack_length > stack_name_len:
-                    stack_name_len = stack_length
-                    spaces = stack_name_len
-                else:
-                    d = stack_name_len - stack_length
-                    spaces = stack_name_len + d
-                name_age = name_age + " " * spaces
+                spaces = cf_max_len - stack_length
+                name_age = name_age + ' '*spaces
             elif key == "age":
                 if value >= 31:
                     name_age = name_age + " " + str(value)
@@ -132,36 +128,36 @@ def lambda_handler(event, context):
     )
     combined_list.append(message)
     if len(stack_list_over_30) >= 1:
-        stack_list_over_30.insert(0, "___________________________________________")
+        stack_list_over_30.insert(0, "-"*150)
         stack_list_over_30.insert(1, "Stacks are over 30 days old")
-        stack_list_over_30.insert(2, "___________________________________________")
+        stack_list_over_30.insert(2, "-"*150)
         stack_list_over_30.insert(
-            3, "Region         | Stack Name" + " " * stack_name_len + "| Age     "
+            3, "Region         | Stack Name" + " " * 113 + "| Age     "
         )
         stack_list_over_30.insert(
-            4, "-----------------------------------------------------------------------"
+            4, "-"*150
         )
         combined_list.append(stack_list_over_30)
     if len(stack_list_over_5) >= 1:
-        stack_list_over_5.insert(0, "___________________________________________")
+        stack_list_over_5.insert(0, "-"*150)
         stack_list_over_5.insert(1, "Stacks are over 5 days old")
-        stack_list_over_5.insert(2, "___________________________________________")
+        stack_list_over_5.insert(2, "-"*150)
         stack_list_over_5.insert(
-            3, "Region         | Stack Name" + " " * stack_name_len + "| Age     "
+            3, "Region         | Stack Name" + " " * 113 + "| Age     "
         )
         stack_list_over_5.insert(
-            4, "-----------------------------------------------------------------------"
+            4, "-"*150
         )
         combined_list.append(stack_list_over_5)
     if len(stack_list_under_5) >= 1:
-        stack_list_under_5.insert(0, "___________________________________________")
+        stack_list_under_5.insert(0, "-"*150)
         stack_list_under_5.insert(1, "Stacks are less than 5 days old")
-        stack_list_under_5.insert(2, "___________________________________________")
+        stack_list_under_5.insert(2, "-"*150)
         stack_list_under_5.insert(
-            3, "Region         | Stack Name" + " " * stack_name_len + "| Age     "
+            3, "Region         | Stack Name" + " " * 113 + "| Age     "
         )
         stack_list_under_5.insert(
-            4, "-----------------------------------------------------------------------"
+            4, "-"*150
         )
         combined_list.append(stack_list_under_5)
 
@@ -170,7 +166,7 @@ def lambda_handler(event, context):
     """
     Post SNS Message
     """
-    topic_arn = f"arn:aws:sns:us-east-1:{account_id}:{department}-{namespace}-cfn-stack-removal-reminder"  # noqa
+    topic_arn = f"arn:aws:sns:us-east-1:{account_id}:cfn-stack-removal-reminder"  # noqa
     response = sns.publish(  # noqa: F841
         TopicArn=topic_arn,
         Message=lines,
